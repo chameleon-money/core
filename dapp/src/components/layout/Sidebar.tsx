@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
   { title: "Home", icon: <Home size={20} />, href: "/" },
   { title: "Swap", icon: <ArrowsUpFromLine size={20} />, href: "/swap" },
   { title: "Debug", icon: <Package size={20} />, href: "/debug" },
-  { title: "Portfolio", icon: <User2Icon size={20} />, href: "/portoflio" },
+  { title: "Portfolio", icon: <User2Icon size={20} />, href: "/portfolio" },
 ];
 
 const Sidebar = ({ className }: SidebarProps) => {
