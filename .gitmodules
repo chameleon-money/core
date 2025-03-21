@@ -1,0 +1,3 @@
+[submodule "solidityContracts/lib/forge-std"]
+	path = solidityContracts/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
