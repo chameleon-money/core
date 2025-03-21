@@ -40,17 +40,29 @@ const BlockchainSwapWidget = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [transactionStatus, setTransactionStatus] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [draggingSlider, setDraggingSlider] = useState(false);
 
   useEffect(() => {
     if (fromToken && toToken && fromAmount && !isNaN(parseFloat(fromAmount))) {
       const fromValue = parseFloat(fromAmount);
       const exchangeRate = fromToken.price / toToken.price;
-      const calculatedAmount = (fromValue * exchangeRate).toFixed(6);
-      setToAmount(calculatedAmount);
+
+      // Apply slippage to the exchange rate (negative slippage for "to" amount)
+      const slippageMultiplier = 1 - slippage / 100;
+      const calculatedAmount = (
+        fromValue *
+        exchangeRate *
+        slippageMultiplier
+      ).toFixed(6);
+
+      // Only update if not currently dragging the slider to prevent choppy updates
+      if (!draggingSlider) {
+        setToAmount(calculatedAmount);
+      }
     } else {
       setToAmount("0.0");
     }
-  }, [fromToken, toToken, fromAmount]);
+  }, [fromToken, toToken, fromAmount, slippage, draggingSlider]);
 
   const handleSwapTokens = () => {
     const temp = fromToken;
@@ -146,11 +158,13 @@ const BlockchainSwapWidget = () => {
                 <span className="text-sm">Slippage Tolerance</span>
                 <div className="flex items-center space-x-2">
                   <Slider
-                    defaultValue={[slippage]}
+                    value={[slippage]}
                     max={5}
                     step={0.1}
                     onValueChange={(values) => setSlippage(values[0])}
-                    className="w-24"
+                    onValueCommit={(values) => setDraggingSlider(false)}
+                    onPointerDown={() => setDraggingSlider(true)}
+                    className="w-24 [&>span]:bg-blue-600 [&>span]:border-blue-600"
                   />
                   <span className="text-sm font-medium">{slippage}%</span>
                 </div>
@@ -280,11 +294,21 @@ const BlockchainSwapWidget = () => {
           <div className="text-xs text-gray-400 p-2 space-y-1">
             <div className="flex justify-between">
               <span>Price</span>
-              <span>
-                1 {fromToken?.symbol} ={" "}
-                {(fromToken?.price / toToken?.price).toFixed(6)}{" "}
-                {toToken?.symbol}
-              </span>
+              <div className="flex flex-col items-end">
+                <span>
+                  1 {fromToken?.symbol} ={" "}
+                  {(fromToken?.price / toToken?.price).toFixed(6)}{" "}
+                  {toToken?.symbol}
+                </span>
+                <span className="text-yellow-500 text-xs">
+                  (incl. {slippage}% slippage:{" "}
+                  {(
+                    (fromToken?.price / toToken?.price) *
+                    (1 - slippage / 100)
+                  ).toFixed(6)}{" "}
+                  {toToken?.symbol})
+                </span>
+              </div>
             </div>
             <div className="flex justify-between">
               <span>Gas Fee</span>
@@ -294,7 +318,7 @@ const BlockchainSwapWidget = () => {
             </div>
             <div className="flex justify-between">
               <span>Slippage Tolerance</span>
-              <span>{slippage}%</span>
+              <span className="text-blue-400">{slippage}%</span>
             </div>
           </div>
 
