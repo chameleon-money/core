@@ -87,6 +87,10 @@ export const generateAztecWallet = async () => {
   ) {
     console.log("Using existing wallet from cookie");
 
+    const addressHex = existingWalletData.address.startsWith("0x")
+      ? existingWalletData.address.slice(2)
+      : existingWalletData.address;
+
     const privateKeyHex = existingWalletData.privateKey.startsWith("0x")
       ? existingWalletData.privateKey.slice(2)
       : existingWalletData.privateKey;
@@ -127,18 +131,13 @@ export const generateAztecWallet = async () => {
   await newAccount.deploy({ deployWallet: wallet }).wait();
   const newWallet = await newAccount.getWallet();
 
-  // Get wallet information using the appropriate methods
-  // We need to extract the address information from the wallet
-  const addressString = newWallet.getAddress().toString();
-  const address = addressString.startsWith("0x")
-    ? addressString.slice(2)
-    : addressString;
-
-  // Extract the secretKey using the proper getter method if available
-  const pKey = secretKey.toString();
-
-  // For signingKey, use the private key we already have
-  const sigKey = signingPrivateKey.toString();
+  const address =
+    newWallet.account.address.address.xCoord.asBuffer.toString("hex");
+  const pKey = newWallet.secretKey.asBuffer.toString("hex");
+  const sigKey =
+    newWallet.account.authWitnessProvider.signingPrivateKey.asBuffer.toString(
+      "hex"
+    );
 
   const walletData: WalletData = {
     address: `0x${address}`,
