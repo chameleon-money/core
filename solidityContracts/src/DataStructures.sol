@@ -4,10 +4,10 @@
 pragma solidity >=0.8.27;
 
 library DataStructures {
-  struct OutboxMessageMetadata {
-    uint256 _l2BlockNumber;
-    uint256 _leafIndex;
-    bytes32[] _path;
-  }
+    struct OutboxMessageMetadata {
+        uint256 _l2BlockNumber;
+        uint256 _leafIndex;
+        bytes32[] _path;
+    }
 }
 // docs:end:portals_data_structures
