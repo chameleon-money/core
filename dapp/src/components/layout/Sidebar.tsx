@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { X, Menu, Home, Package, ArrowsUpFromLine } from "lucide-react";
+import {
+  X,
+  Menu,
+  Home,
+  Package,
+  ArrowsUpFromLine,
+  User2Icon,
+} from "lucide-react";
 import { useLocation, NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -19,6 +26,7 @@ const navItems: NavItem[] = [
   { title: "Home", icon: <Home size={20} />, href: "/" },
   { title: "Swap", icon: <ArrowsUpFromLine size={20} />, href: "/swap" },
   { title: "Debug", icon: <Package size={20} />, href: "/debug" },
+  { title: "Portfolio", icon: <User2Icon size={20} />, href: "/portoflio" },
 ];
 
 const Sidebar = ({ className }: SidebarProps) => {
@@ -57,7 +65,7 @@ const Sidebar = ({ className }: SidebarProps) => {
     <>
       <aside
         className={cn(
-          "hidden h-screen w-64 flex-col bg-slate-900 p-4 md:flex",
+          "hidden h-screen w-64 flex-col bg-gray-950 p-4 md:flex",
           className
         )}
       >
@@ -77,7 +85,7 @@ const Sidebar = ({ className }: SidebarProps) => {
           </SheetTrigger>
           <SheetContent
             side="left"
-            className="w-64 border-none bg-slate-900 p-0"
+            className="w-64 border-none bg-gray-950 p-0"
           >
             <div className="flex h-full flex-col p-4">
               <Button
