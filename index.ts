@@ -86,7 +86,7 @@ async function main() {
   logger.info(`L2 token contract deployed at ${l2TokenContract.address}`);
 
   const l1TokenContract = await deployTestERC20();
-  logger.info("erc20 contract deployed");
+  logger.info("erc20 contract deployed ", l1TokenContract);
 
   const l1TokenManager = new L1TokenManager(
     l1TokenContract,
@@ -96,7 +96,7 @@ async function main() {
   );
 
   const l1PortalContractAddress = await deployTokenPortal();
-  logger.info("L1 portal contract deployed");
+  logger.info("L1 portal contract deployed ", l1PortalContractAddress);
 
   const l1Portal = getContract({
     address: l1PortalContractAddress.toString(),
