@@ -1,0 +1,2 @@
+@oz/=lib/openzeppelin-contracts/contracts/
+@aztec/=lib/aztec-packages/l1-contracts/src/
