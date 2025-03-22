@@ -1,8 +1,82 @@
 import { getSchnorrAccount } from "@aztec/accounts/schnorr";
 import { getDeployedTestAccountsWallets } from "@aztec/accounts/testing";
-import { Fr, GrumpkinScalar, createPXEClient } from "@aztec/aztec.js";
+import {
+  Fr,
+  GrumpkinScalar,
+  createPXEClient,
+  Contract,
+  AztecAddress,
+} from "@aztec/aztec.js";
+import {
+  TokenContract,
+  TokenContractArtifact,
+} from "@aztec/noir-contracts.js/Token";
+
+import { createPublicClient, http, formatUnits, Address, erc20Abi } from "viem";
+import { anvil } from "viem/chains";
 
 import web3Config from "../web3Config";
+
+export const fetchAztecTokenBalance = async (wallet) => {
+  const l2Token =
+    // Buffer.from(
+    "0x295142a86cddcf8d5942f46ae5a258105b036c4a6afe76aae899eecf6cc15efa";
+  //   "hex"
+  // );
+
+  const PXE_URL = "http://localhost:8080";
+  const pxe = createPXEClient(PXE_URL);
+  // docs:end:define_account_vars
+
+  // docs:start:create_wallet
+  // Use a pre-funded wallet to pay for the fees for the deployments.
+  const testwallet = (await getDeployedTestAccountsWallets(pxe))[0];
+
+  console.log(wallet);
+  console.log(testwallet.getAddress().toString("hex"));
+
+  // const deployedContract = await TokenContract.deploy(
+  //   testwallet, // wallet instance
+  //   testwallet.getAddress(), // account
+  //   "TokenName", // constructor arg1
+  //   "TokenSymbol", // constructor arg2
+  //   18
+  // )
+  //   .send()
+  //   .deployed();
+
+  // console.log(deployedContract);
+  // console.log(deployedContract.address);
+
+  const secretKey = Fr.random();
+  const signingPrivateKey = GrumpkinScalar.random();
+  const newAccount = await getSchnorrAccount(pxe, secretKey, signingPrivateKey);
+  await newAccount.deploy({ deployWallet: wallet }).wait();
+  const newWallet = await newAccount.getWallet();
+
+  const contract = await Contract.at(
+    // deployedContract.address,
+    l2Token,
+    TokenContractArtifact,
+    // testwallet
+    // wallet
+    newWallet
+  );
+
+  const balance = await contract.methods
+    .balance_of_public(
+      // wallet
+      // testwallet
+      newWallet.getAddress()
+    )
+    .simulate();
+
+  return balance;
+};
+
+/**
+ * Browser Utils
+ */
 
 export const setCookie = (
   name: string,
@@ -74,6 +148,10 @@ interface WalletData {
   privateKey: string;
   signingPrivateKey: string;
 }
+
+/**
+ * Aztec Utils
+ */
 
 export const generateAztecWallet = async () => {
   const WALLET_COOKIE_NAME = "aztec_wallet_data";
@@ -155,4 +233,56 @@ export const generateAztecWallet = async () => {
 
 export const clearWalletData = (): void => {
   deleteCookie("aztec_wallet_data");
+};
+
+/**
+ * EVM Utils
+ */
+
+export const fetchEthereumBalances = async (address: string) => {
+  const tokenAddresses = web3Config.tokens.ethereum;
+
+  try {
+    const publicClient = createPublicClient({
+      chain: anvil,
+      transport: http(),
+    });
+
+    const balancePromises = Object.entries(tokenAddresses).map(
+      async ([symbol, tokenAddress]) => {
+        const decimals = await publicClient.readContract({
+          address: tokenAddress,
+          abi: erc20Abi,
+          functionName: "decimals",
+        });
+
+        const balance = await publicClient.readContract({
+          address: tokenAddress,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [address as Address],
+        });
+
+        const formattedBalance = formatUnits(balance, decimals);
+
+        return {
+          symbol,
+          balance: formattedBalance,
+          decimals,
+        };
+      }
+    );
+
+    const balances = await Promise.all(balancePromises);
+    return balances;
+  } catch (error) {
+    console.error("Error fetching Ethereum balances:", error);
+
+    return Object.keys(tokenAddresses).map((symbol) => ({
+      symbol,
+      balance: "0",
+      // decimals: symbol === "USDC" || symbol === "USDT" ? 6 : 18,
+      decimals: 18,
+    }));
+  }
 };

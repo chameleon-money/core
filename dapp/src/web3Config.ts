@@ -16,12 +16,12 @@ const web3Config = {
   },
   tokens: {
     ethereum: {
-      DAI: "0x",
-      USDC: "0x",
+      // DAI: "0x",
+      USDC: "0xf274De14171Ab928A5Ec19928cE35FaD91a42B64",
     },
     aztec: {
-      DAI: "0x0572ebc00529cc9f693d4fcb371e22536351dc8b99756b02c5a87080e4e99ac6",
-      USDC: "0x",
+      // DAI: "0x0572ebc00529cc9f693d4fcb371e22536351dc8b99756b02c5a87080e4e99ac6",
+      USDC: "0x295142a86cddcf8d5942f46ae5a258105b036c4a6afe76aae899eecf6cc15efa",
     },
   },
   wallet: {
