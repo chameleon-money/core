@@ -1,10 +1,16 @@
 # Chameleon - Aztec + Noir privacy layer
 
-![Chameleon logo](/dapp/public/chameleon.png)
+<p align="center">
+  <img src="/dapp/public/chameleon.png" alt="Chameleon logo" width="200" height="auto">
+</p>
 
 ## Overview
 
 Chameleon is first private web-based wallet + privacy layer built with Aztec + Noir.
+
+<p align="center">
+  <img src="/dapp/public/screenshot1.png" alt="Dapp hero element" width="1000" height="auto">
+</p>
 
 Current features include:
 
@@ -14,18 +20,23 @@ Current features include:
 - Private swaps initiated from Aztec and executed through Uniswap on Ethereum by using token portal
 - Private bridging to Ethereum using token portal
 
+## Chameleon Architecture
+
 ```mermaid
 flowchart TD
-    subgraph User["User Interaction"]
+    %% Professional styling for Chameleon architecture diagram
+    %% Enhanced with better contrasts and spacing
+
+    subgraph User["🧑‍💻 User Interaction"]
         A[Web Interface] --> B[Wallet Generation]
         A --> C[Portfolio Management]
     end
 
-    subgraph AztecLayer["Aztec Blockchain Layer"]
+    subgraph AztecLayer["🔐 Aztec Blockchain Layer"]
         B --> D[Persistent Wallet Storage]
         D --> E[Private Asset Management]
 
-        subgraph NoirContracts["Noir Privacy Contracts"]
+        subgraph NoirContracts["🧩 Noir Privacy Contracts"]
             N1[Transfer Contract]
             N2[Swap Contract]
             N3[Bridge Contract]
@@ -36,17 +47,20 @@ flowchart TD
         E --> N3
     end
 
-    subgraph EthLayer["Ethereum Blockchain Layer"]
-        subgraph TokenPortal["Token Portal"]
+    subgraph EthLayer["⛓️ Ethereum Blockchain Layer"]
+        subgraph TokenPortal["🌉 Token Portal"]
             TP[Portal Contract]
         end
 
-        subgraph SolidityContracts["Solidity Smart Contracts"]
+        subgraph SolidityContracts["📝 Solidity Smart Contracts"]
             S1[Transfer Handler]
             S2[Swap Handler]
             S3[Bridge Handler]
         end
 
+        subgraph DEX["💱 DEX]
+            UNI[Uniswap Protocol]
+        end
     end
 
     N1 --> TP
@@ -57,13 +71,15 @@ flowchart TD
     TP --> S2
     TP --> S3
 
-    classDef userInt fill:#f9d5e5,stroke:#333,stroke-width:1px;
-    classDef aztecMain fill:#d0e8fa,stroke:#333,stroke-width:1px;
-    classDef noir fill:#a6c8e6,stroke:#333,stroke-width:1px;
-    classDef ethMain fill:#d1e7dd,stroke:#333,stroke-width:1px;
-    classDef portal fill:#ffe5b4,stroke:#333,stroke-width:1px;
-    classDef solidity fill:#b7e1cd,stroke:#333,stroke-width:1px;
-    classDef dex fill:#c5e8b7,stroke:#333,stroke-width:1px;
+    S2 --> UNI
+
+    classDef userInt fill:#5D4EF1,stroke:#1a1a1a,stroke-width:2px,color:#FFFFFF,font-weight:bold;
+    classDef aztecMain fill:#408AC9,stroke:#1a1a1a,stroke-width:2px,color:#FFFFFF,font-weight:bold;
+    classDef noir fill:#2E5793,stroke:#1a1a1a,stroke-width:2px,color:#FFFFFF,font-weight:bold;
+    classDef ethMain fill:#4CAF50,stroke:#1a1a1a,stroke-width:2px,color:#FFFFFF,font-weight:bold;
+    classDef portal fill:#FF9800,stroke:#1a1a1a,stroke-width:2px,color:#1a1a1a,font-weight:bold;
+    classDef solidity fill:#229954,stroke:#1a1a1a,stroke-width:2px,color:#FFFFFF,font-weight:bold;
+    classDef dex fill:#6AC957,stroke:#1a1a1a,stroke-width:2px,color:#1a1a1a,font-weight:bold;
 
     class A,B,C userInt;
     class D,E aztecMain;
