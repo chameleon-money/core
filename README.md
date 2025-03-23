@@ -1,4 +1,4 @@
-# Chameleon - Aztec + Noir privacy layer
+# Chameleon: Private web-based wallet | Aztec + Noir privacy layer
 
 <p align="center">
   <img src="/dapp/public/chameleon.png" alt="Chameleon logo" width="200" height="auto">
@@ -10,6 +10,10 @@ Chameleon is first private web-based wallet + privacy layer built with Aztec + N
 
 <p align="center">
   <img src="/dapp/public/screenshot1.png" alt="Dapp hero element" width="1000" height="auto">
+</p>
+
+<p align="center">
+  <img src="/dapp/public/screenshot2.png" alt="Dapp hero element" width="1000" height="auto">
 </p>
 
 Current features include:
