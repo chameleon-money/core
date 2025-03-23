@@ -197,7 +197,7 @@ const Home = () => {
           <h2 className="text-2xl font-bold text-white">
             Experience the Future
           </h2>
-          <p className="text-slate-400">Discover what sets Aztec Noir apart</p>
+          <p className="text-slate-400">Chameleon Features</p>
         </div>
         <div
           className="relative mt-4 overflow-hidden"
