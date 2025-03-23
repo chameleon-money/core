@@ -187,9 +187,12 @@ async function wait(hash: `0x${string}`) {
  * 12. Mint USDC on l1 ✅
  * 13. Transfer USDC to L2 ✅
  * 14. Claim USDC on L2 ✅
- * 15. Lend the crypto on L2
+ * 15. Lend the crypto on L2 ✅
+ * 16. Call the lendPrivate function on L1 ✅
+ * 17. Comsume the message for the share tokens on L2 ✅
+ * 18. Claim the share tokens on L2 ✅
  *
- * Next Steps TBD
+ * Next Steps Borrowing (TBD)
  *
  */
 
