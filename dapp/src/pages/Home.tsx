@@ -404,8 +404,9 @@ const Home = () => {
           </div>
           <div className="flex gap-3">
             <a
-              href="https://github.com/chameleon-money/token-bridge-test"
+              href="https://github.com/chameleon-money/core"
               target="_blank"
+              rel="noreferrer"
             >
               <Button
                 variant="outline"
