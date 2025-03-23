@@ -331,10 +331,9 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <Card
             className="hover:border-primary/50 cursor-pointer transition-colors"
             onClick={() => navigateTo("/portfolio")}
@@ -369,20 +368,7 @@ const Home = () => {
               <CreditCard className="h-8 w-8 mb-3 text-primary" />
               <span className="font-medium">Swap</span>
               <span className="text-xs text-muted-foreground mt-1">
-                Exchange assets
-              </span>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="hover:border-primary/50 cursor-pointer transition-colors"
-            onClick={() => navigateTo("/settings")}
-          >
-            <CardContent className="p-6 flex flex-col items-center text-center">
-              <Settings className="h-8 w-8 mb-3 text-primary" />
-              <span className="font-medium">Settings</span>
-              <span className="text-xs text-muted-foreground mt-1">
-                Configure wallet
+                Swap assets
               </span>
             </CardContent>
           </Card>
@@ -404,9 +390,8 @@ const Home = () => {
           </div>
           <div className="flex gap-3">
             <a
-              href="https://github.com/chameleon-money/core"
+              href="https://github.com/chameleon-money/token-bridge-test"
               target="_blank"
-              rel="noreferrer"
             >
               <Button
                 variant="outline"
