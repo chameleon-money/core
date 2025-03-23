@@ -58,7 +58,7 @@ flowchart TD
             S3[Bridge Handler]
         end
 
-        subgraph DEX["💱 DEX]
+        subgraph DEX["💱 DEX"]
             UNI[Uniswap Protocol]
         end
     end
