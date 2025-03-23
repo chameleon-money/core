@@ -6,6 +6,7 @@ import {
   Package,
   ArrowsUpFromLine,
   User2Icon,
+  Send,
 } from "lucide-react";
 import { useLocation, NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -24,9 +25,10 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { title: "Home", icon: <Home size={20} />, href: "/" },
+  { title: "Send", icon: <Send size={20} />, href: "/send" },
   { title: "Swap", icon: <ArrowsUpFromLine size={20} />, href: "/swap" },
-  { title: "Debug", icon: <Package size={20} />, href: "/debug" },
   { title: "Portfolio", icon: <User2Icon size={20} />, href: "/portfolio" },
+  { title: "Debug", icon: <Package size={20} />, href: "/debug" },
 ];
 
 const Sidebar = ({ className }: SidebarProps) => {
@@ -37,6 +39,19 @@ const Sidebar = ({ className }: SidebarProps) => {
     <>
       <div className="mb-4 px-4">
         <h2 className="text-xl font-bold text-white">Chameleon</h2>
+        <div className="relative w-16 h-16 flex mx-auto my-4">
+          <div className="absolute inset-0 overflow-hidden rounded-3xl">
+            <div
+              className="w-full h-full bg-cover bg-center"
+              style={{
+                backgroundImage: "url('/chameleon.png')",
+                maskImage: "linear-gradient(to top, transparent, purple 40%)",
+                WebkitMaskImage:
+                  "linear-gradient(to top, transparent, purple 40%)",
+              }}
+            />
+          </div>
+        </div>
       </div>
       <nav className="space-y-1 px-2">
         {navItems.map((item) => (
@@ -47,8 +62,8 @@ const Sidebar = ({ className }: SidebarProps) => {
               cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                 isActive
-                  ? "bg-slate-800 text-white"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  ? "bg-slate-800/80 text-white backdrop-blur-sm"
+                  : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
               )
             }
             end={item.href === "/"}
@@ -65,7 +80,7 @@ const Sidebar = ({ className }: SidebarProps) => {
     <>
       <aside
         className={cn(
-          "hidden h-screen w-64 flex-col bg-gray-950 p-4 md:flex",
+          "hidden h-screen w-48 flex-col bg-gray-950/20 backdrop-blur-md border-r border-white/10 p-4 md:flex",
           className
         )}
       >
@@ -85,17 +100,17 @@ const Sidebar = ({ className }: SidebarProps) => {
           </SheetTrigger>
           <SheetContent
             side="left"
-            className="w-64 border-none bg-gray-950 p-0"
+            className="w-64 border-none bg-gray-950/70 backdrop-blur-md p-0"
           >
             <div className="flex h-full flex-col p-4">
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsMobileOpen(false)}
-                className="absolute right-4 top-4 text-slate-400 hover:text-white"
+                className="absolute right-4 top-4 text-slate-300 hover:text-white"
               >
                 <X className="h-5 w-5" />
-              </Button>
+              </Button> */}
               <NavItems />
             </div>
           </SheetContent>

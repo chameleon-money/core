@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
 import Swap from "./pages/Swap";
+import Send from "./pages/Send";
 import Home from "./pages/Home";
 import Portfolio from "./pages/Portfolio";
 import TokenBridgeFrontend from "./components/TokenBridgeFrontend";
@@ -13,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
+          <Route path="/send" element={<Send />} />
           <Route path="/swap" element={<Swap />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/debug" element={<TokenBridgeFrontend />} />

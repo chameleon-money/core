@@ -1,486 +1,173 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Copy, Eye, EyeOff, Send, RefreshCw } from "lucide-react";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import {
-  Eye,
-  EyeOff,
-  Copy,
-  Check,
-  ExternalLink,
-  Shield,
-  Lock,
-  RefreshCw,
-  Diamond,
-  Layers,
-} from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-
-// Mocked for now
-const mockEVMWallet = {
-  address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-  balance: 1.245,
-  tokens: [
-    {
-      symbol: "ETH",
-      name: "Ethereum",
-      balance: 1.245,
-      usdValue: 2933.76,
-      isPrivate: false,
-      layer: "L1",
-    },
-    {
-      symbol: "USDC",
-      name: "USD Coin",
-      balance: 420.69,
-      usdValue: 420.69,
-      isPrivate: false,
-      layer: "L1",
-    },
-    {
-      symbol: "LINK",
-      name: "Chainlink",
-      balance: 25.5,
-      usdValue: 382.5,
-      isPrivate: false,
-      layer: "L1",
-    },
-    {
-      symbol: "UNI",
-      name: "Uniswap",
-      balance: 12.3,
-      usdValue: 73.8,
-      isPrivate: false,
-      layer: "L1",
-    },
-  ],
-};
-
-const mockAztecWallet = {
-  address: "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
-  privateKey: "******************************************************",
-  balance: 0.75,
-  tokens: [
-    {
-      symbol: "ETH",
-      name: "Ethereum",
-      balance: 0.75,
-      usdValue: 1762.5,
-      isPrivate: true,
-      layer: "L2",
-    },
-    {
-      symbol: "USDC",
-      name: "USD Coin",
-      balance: 150,
-      usdValue: 150,
-      isPrivate: true,
-      layer: "L2",
-    },
-    {
-      symbol: "DAI",
-      name: "Dai",
-      balance: 200,
-      usdValue: 200,
-      isPrivate: true,
-      layer: "L2",
-    },
-    {
-      symbol: "ETH",
-      name: "Ethereum",
-      balance: 0.25,
-      usdValue: 587.5,
-      isPrivate: false,
-      layer: "L2",
-    },
-  ],
-};
+import { Separator } from "@/components/ui/separator";
+import { toast } from "@/hooks/use-toast";
 
 const Portfolio = () => {
+  // Force dark mode
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+    return () => {
+      document.documentElement.classList.remove("dark");
+    };
+  }, []);
+  const navigate = useNavigate();
   const [showPrivateKey, setShowPrivateKey] = useState(false);
-  const [copyAddressStatus, setCopyAddressStatus] = useState(false);
-  const [copyPrivateKeyStatus, setCopyPrivateKeyStatus] = useState(false);
-  const [isConnected, setIsConnected] = useState(true);
-  const [isAztecInitialized, setIsAztecInitialized] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showSigningKey, setShowSigningKey] = useState(false);
 
-  const totalPortfolioValue = [
-    ...mockEVMWallet.tokens,
-    ...mockAztecWallet.tokens,
-  ].reduce((sum, token) => sum + token.usdValue, 0);
+  const walletData = {
+    publicAddress: "aztec:0x7Fc9a0C166E6B2C045D9e19F9Bb69511FeA14F5b",
+    privateKey:
+      "0x8a85d840b24f2f9210837f190563e87eb40395c9f95824d0edfee8d6290c25ad",
+    signingKey:
+      "0x2a63f0c8912d4b5e8a9f6c9e4c8f9e6a4f5b2c1e0d9f8b7a6c5d4e3f2a1b0c9d8",
+    assets: [
+      {
+        id: 1,
+        name: "ETH",
+        amount: 2.45,
+        privateAmount: 1.75,
+        publicAmount: 0.7,
+        value: 7350,
+      },
+      {
+        id: 2,
+        name: "BTC",
+        amount: 0.15,
+        privateAmount: 0.1,
+        publicAmount: 0.05,
+        value: 9450,
+      },
+      {
+        id: 3,
+        name: "USDC",
+        amount: 1250,
+        privateAmount: 1000,
+        publicAmount: 250,
+        value: 1250,
+      },
+      {
+        id: 4,
+        name: "AZTNR",
+        amount: 500,
+        privateAmount: 450,
+        publicAmount: 50,
+        value: 2500,
+      },
+    ],
+    totalValue: 20550,
+  };
 
-  const privateAssetsValue = [
-    ...mockEVMWallet.tokens,
-    ...mockAztecWallet.tokens,
-  ]
-    .filter((token) => token.isPrivate)
-    .reduce((sum, token) => sum + token.usdValue, 0);
+  const historyData = [
+    { name: "Jan", value: 12000 },
+    { name: "Feb", value: 14000 },
+    { name: "Mar", value: 11000 },
+    { name: "Apr", value: 15000 },
+    { name: "May", value: 18000 },
+    { name: "Jun", value: 17000 },
+    { name: "Jul", value: 20550 },
+  ];
 
-  const privatePercentage = Math.round(
-    (privateAssetsValue / totalPortfolioValue) * 100
-  );
-
-  const copyToClipboard = (text, setter) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setter(true);
-      setTimeout(() => setter(false), 2000);
+  const copyToClipboard = (text, type) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to clipboard",
+      description: `${type} has been copied to your clipboard.`,
     });
+  };
+
+  const navigateToSend = () => {
+    navigate("/send");
+  };
+
+  const navigateToSwap = (assetId) => {
+    navigate(`/swap?asset=${assetId}`);
   };
 
   const togglePrivateKey = () => {
     setShowPrivateKey(!showPrivateKey);
   };
 
-  const refreshBalances = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1500);
+  const toggleSigningKey = () => {
+    setShowSigningKey(!showSigningKey);
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200 p-6">
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-100">Portfolio</h1>
-              <p className="text-gray-400">
-                Manage your assets across L1 and private L2 wallets
-              </p>
-            </div>
-            <div className="mt-4 md:mt-0">
-              <Button
-                onClick={refreshBalances}
-                className="bg-gray-800 hover:bg-gray-700 text-white"
-                disabled={isRefreshing}
-              >
-                <RefreshCw
-                  className={`h-4 w-4 mr-2 ${
-                    isRefreshing ? "animate-spin" : ""
-                  }`}
-                />
-                Refresh
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-gray-100">
-                  Total Balance
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-100">
-                  ${totalPortfolioValue.toFixed(2)}
-                </div>
-                <p className="text-sm text-gray-400 mt-1">Across all wallets</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-gray-100">Assets</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-2xl font-bold text-gray-100">
-                    {privatePercentage}%
-                  </span>
-                </div>
-                <Progress
-                  value={privatePercentage}
-                  className="h-2 bg-gray-800 text-gray-100"
-                />
-                <p className="text-sm text-gray-400 mt-2">
-                  {privateAssetsValue.toFixed(2)} USD in private assets
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-gray-100">
-                  Distribution
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center">
-                  <div className="flex flex-col">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-gray-400 mr-2"></div>
-                      <span className="text-sm text-gray-300">Ethereum L1</span>
-                    </div>
-                    <span className="text-xl font-medium mt-1 text-gray-200">
-                      $
-                      {mockEVMWallet.tokens
-                        .reduce((sum, token) => sum + token.usdValue, 0)
-                        .toFixed(2)}
-                    </span>
+    <div className="container mx-auto px-4 py-8 max-w-6xl text-foreground">
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-2/3">
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Aztec Noir Wallet</CardTitle>
+                <Badge variant="outline" className="font-mono">
+                  Private
+                </Badge>
+              </div>
+              <CardDescription>
+                Secure private transactions on Aztec Network
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    Public Address
                   </div>
-
-                  <div className="flex flex-col">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                      <span className="text-sm text-gray-300">Aztec L2</span>
-                    </div>
-                    <span className="text-xl font-medium mt-1 text-gray-200">
-                      $
-                      {mockAztecWallet.tokens
-                        .reduce((sum, token) => sum + token.usdValue, 0)
-                        .toFixed(2)}
-                    </span>
+                  <div className="flex items-center gap-2 p-2 bg-muted rounded-md font-mono text-xs md:text-sm break-all">
+                    {walletData.publicAddress}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() =>
+                        copyToClipboard(
+                          walletData.publicAddress,
+                          "Public address"
+                        )
+                      }
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="bg-gray-800 bg-opacity-80 p-2 rounded-full mr-3 border border-gray-700 shadow-inner">
-                      <Diamond className="h-5 w-5 text-blue-200" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-gray-100">
-                        EVM Wallet
-                      </CardTitle>
-                      <CardDescription className="text-gray-400">
-                        Public Ethereum Wallet
-                      </CardDescription>
-                    </div>
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    Private Key
                   </div>
-                  <Badge
-                    variant={isConnected ? "outline" : "destructive"}
-                    className={
-                      isConnected
-                        ? "bg-green-900/30 text-green-300 border-green-700 shadow-sm"
-                        : "shadow-sm"
-                    }
-                  >
-                    {isConnected ? "Connected" : "Disconnected"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-800 p-3 rounded-lg mb-4 border border-gray-700/50 shadow-inner">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-gray-300 font-medium">
-                      Address
-                    </span>
-                    <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-between p-2 bg-muted rounded-md font-mono text-xs md:text-sm break-all">
+                    {showPrivateKey
+                      ? walletData.privateKey
+                      : "••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••"}
+                    <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          copyToClipboard(
-                            mockEVMWallet.address,
-                            setCopyAddressStatus
-                          )
-                        }
-                        className="h-6 px-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                      >
-                        {copyAddressStatus ? (
-                          <Check className="h-3 w-3 text-green-400" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                        onClick={() =>
-                          window.open(
-                            `https://etherscan.io/address/${mockEVMWallet.address}`,
-                            "_blank"
-                          )
-                        }
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="font-mono text-sm break-all text-blue-100 bg-gray-850 p-2 rounded border border-gray-700/50">
-                    {mockEVMWallet.address}
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-400 mb-3">
-                    Assets
-                  </h3>
-                  <div className="bg-gray-850 rounded-lg border border-gray-800/80 overflow-hidden shadow-md">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="hover:bg-transparent border-gray-800">
-                          <TableHead className="text-gray-300 bg-gray-850">
-                            Token
-                          </TableHead>
-                          <TableHead className="text-gray-300 text-right bg-gray-850">
-                            Balance
-                          </TableHead>
-                          <TableHead className="text-gray-300 text-right bg-gray-850">
-                            Value (USD)
-                          </TableHead>
-                          <TableHead className="text-gray-300 text-right bg-gray-850">
-                            Status
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {mockEVMWallet.tokens.map((token, index) => (
-                          <TableRow
-                            key={index}
-                            className="hover:bg-gray-800 border-gray-800/50"
-                          >
-                            <TableCell className="font-medium text-gray-200">
-                              <div className="flex items-center">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 border border-gray-700 shadow-sm flex items-center justify-center mr-2">
-                                  <span className="text-xs font-semibold text-gray-100">
-                                    {token.symbol.charAt(0)}
-                                  </span>
-                                </div>
-                                <span>{token.symbol}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right text-gray-100">
-                              {token.balance}
-                            </TableCell>
-                            <TableCell className="text-right font-medium text-gray-100">
-                              ${token.usdValue.toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Badge
-                                variant="outline"
-                                className="bg-gray-800 text-gray-300 border-gray-700 shadow-sm"
-                              >
-                                <Layers className="h-3 w-3 mr-1" />
-                                {token.layer}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center text-sm text-gray-400">
-                  <span>Total Balance</span>
-                  <span className="font-medium">
-                    $
-                    {mockEVMWallet.tokens
-                      .reduce((sum, token) => sum + token.usdValue, 0)
-                      .toFixed(2)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="bg-blue-900/40 p-2 rounded-full mr-3 border border-blue-700/50 shadow-inner">
-                      <Shield className="h-5 w-5 text-blue-300" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-gray-100">
-                        Aztec Wallet
-                      </CardTitle>
-                      <CardDescription className="text-gray-400">
-                        Private L2 Wallet
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <Badge
-                    variant={isAztecInitialized ? "outline" : "destructive"}
-                    className={
-                      isAztecInitialized
-                        ? "bg-blue-900/20 text-blue-300 border-blue-800"
-                        : ""
-                    }
-                  >
-                    {isAztecInitialized ? "Initialized" : "Requires Setup"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-800 p-3 rounded-lg mb-4 border border-gray-700/50 shadow-inner">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-gray-300 font-medium">
-                      Address
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          copyToClipboard(
-                            mockAztecWallet.address,
-                            setCopyAddressStatus
-                          )
-                        }
-                        className="h-6 px-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                      >
-                        {copyAddressStatus ? (
-                          <Check className="h-3 w-3 text-green-400" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                        onClick={() =>
-                          window.open(
-                            `https://aztec-explorer.com/address/${mockAztecWallet.address.substring(
-                              3
-                            )}`,
-                            "_blank"
-                          )
-                        }
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="font-mono text-sm break-all text-blue-100 bg-gray-850 p-2 rounded border border-gray-700/50">
-                    {mockAztecWallet.address}
-                  </div>
-                </div>
-
-                <div className="bg-gray-800 p-3 rounded-lg mb-4 border border-blue-800/30 shadow-inner">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-blue-300 font-medium flex items-center">
-                      <Lock className="h-3 w-3 mr-1" />
-                      Private Key
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
+                        size="icon"
+                        className="h-6 w-6"
                         onClick={togglePrivateKey}
-                        className="h-6 px-2 text-gray-300 hover:text-white hover:bg-gray-700"
                       >
                         {showPrivateKey ? (
                           <EyeOff className="h-3 w-3" />
@@ -490,119 +177,275 @@ const Portfolio = () => {
                       </Button>
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
+                        className="h-6 w-6"
                         onClick={() =>
-                          showPrivateKey &&
-                          copyToClipboard(
-                            "1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z",
-                            setCopyPrivateKeyStatus
-                          )
+                          copyToClipboard(walletData.privateKey, "Private key")
                         }
-                        disabled={!showPrivateKey}
-                        className="h-6 px-2 text-gray-300 hover:text-white hover:bg-gray-700"
                       >
-                        {copyPrivateKeyStatus ? (
-                          <Check className="h-3 w-3 text-green-400" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
+                        <Copy className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
-                  <div
-                    className={`font-mono text-sm break-all p-2 rounded border ${
-                      showPrivateKey
-                        ? "bg-blue-900/20 text-blue-100 border-blue-800/50"
-                        : "bg-gray-850 text-gray-500 border-gray-700/50"
-                    }`}
-                  >
-                    {showPrivateKey
-                      ? "1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z"
-                      : mockAztecWallet.privateKey}
-                  </div>
                 </div>
 
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-400 mb-3">
-                    Assets
-                  </h3>
-                  <div className="bg-gray-850 rounded-lg border border-gray-800/80 overflow-hidden shadow-md">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="hover:bg-transparent border-gray-800">
-                          <TableHead className="text-gray-300 bg-gray-850">
-                            Token
-                          </TableHead>
-                          <TableHead className="text-gray-300 text-right bg-gray-850">
-                            Balance
-                          </TableHead>
-                          <TableHead className="text-gray-300 text-right bg-gray-850">
-                            Value (USD)
-                          </TableHead>
-                          <TableHead className="text-gray-300 text-right bg-gray-850">
-                            Status
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {mockAztecWallet.tokens.map((token, index) => (
-                          <TableRow
-                            key={index}
-                            className="hover:bg-gray-800 border-gray-800/50"
-                          >
-                            <TableCell className="font-medium text-gray-200">
-                              <div className="flex items-center">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 border border-gray-700 shadow-sm flex items-center justify-center mr-2">
-                                  <span className="text-xs font-semibold text-gray-100">
-                                    {token.symbol.charAt(0)}
-                                  </span>
-                                </div>
-                                <span>{token.symbol}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right text-gray-100">
-                              {token.balance}
-                            </TableCell>
-                            <TableCell className="text-right font-medium text-gray-100">
-                              ${token.usdValue.toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {token.isPrivate ? (
-                                <Badge
-                                  variant="outline"
-                                  className="bg-blue-900/30 text-blue-300 border-blue-700/70 shadow-sm"
-                                >
-                                  <Shield className="h-3 w-3 mr-1" />
-                                  Private
-                                </Badge>
-                              ) : (
-                                <Badge
-                                  variant="outline"
-                                  className="bg-gray-800 text-gray-300 border-gray-700 shadow-sm"
-                                >
-                                  Public
-                                </Badge>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    Signing Key
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-muted rounded-md font-mono text-xs md:text-sm break-all">
+                    {showSigningKey
+                      ? walletData.signingKey
+                      : "••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••"}
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={toggleSigningKey}
+                      >
+                        {showSigningKey ? (
+                          <EyeOff className="h-3 w-3" />
+                        ) : (
+                          <Eye className="h-3 w-3" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() =>
+                          copyToClipboard(walletData.signingKey, "Signing key")
+                        }
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="flex justify-between items-center text-sm text-gray-400">
-                  <span>Total Balance</span>
-                  <span className="font-medium">
-                    $
-                    {mockAztecWallet.tokens
-                      .reduce((sum, token) => sum + token.usdValue, 0)
-                      .toFixed(2)}
-                  </span>
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Portfolio Value</CardTitle>
+                <div className="text-xl font-bold">
+                  ${walletData.totalValue.toLocaleString()}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardHeader>
+            <CardContent className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={historyData}
+                  margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                  <XAxis dataKey="name" stroke="#888" />
+                  <YAxis stroke="#888" />
+                  <Tooltip
+                    formatter={(value) => [`${value}`, "Portfolio Value"]}
+                    labelFormatter={(label) => `${label} 2025`}
+                    contentStyle={{
+                      backgroundColor: "#1f2937",
+                      border: "1px solid #374151",
+                      borderRadius: "0.375rem",
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#8b5cf6"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="w-full md:w-1/3">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Assets</CardTitle>
+                <Button variant="outline" size="sm" className="h-8">
+                  <RefreshCw className="h-3 w-3 mr-2" />
+                  Refresh
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="all">
+                <TabsList className="w-full mb-4">
+                  <TabsTrigger value="all" className="flex-1">
+                    All
+                  </TabsTrigger>
+                  <TabsTrigger value="private" className="flex-1">
+                    Private
+                  </TabsTrigger>
+                  <TabsTrigger value="public" className="flex-1">
+                    Public
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="all" className="space-y-4">
+                  {walletData.assets.map((asset) => (
+                    <div
+                      key={asset.id}
+                      className="flex flex-col space-y-3 p-3 border rounded-lg"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <div className="bg-primary text-primary-foreground font-bold text-xs rounded-full h-full w-full flex items-center justify-center dark:bg-violet-600">
+                              {asset.name.substring(0, 2)}
+                            </div>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{asset.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              ${asset.value.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">
+                            {asset.amount.toLocaleString()}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Private: {asset.privateAmount.toLocaleString()} |
+                            Public: {asset.publicAmount.toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => navigateToSwap(asset.id)}
+                        >
+                          Swap
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="flex-1"
+                          onClick={navigateToSend}
+                        >
+                          <Send className="h-3 w-3 mr-1" /> Send
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </TabsContent>
+
+                <TabsContent value="private" className="space-y-4">
+                  {walletData.assets.map((asset) => (
+                    <div
+                      key={asset.id}
+                      className="flex flex-col space-y-3 p-3 border rounded-lg"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <div className="bg-primary text-primary-foreground font-bold text-xs rounded-full h-full w-full flex items-center justify-center">
+                              {asset.name.substring(0, 2)}
+                            </div>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{asset.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Private Balance
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">
+                            {asset.privateAmount.toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => navigateToSwap(asset.id)}
+                        >
+                          Swap
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="flex-1"
+                          onClick={navigateToSend}
+                        >
+                          <Send className="h-3 w-3 mr-1" /> Send
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </TabsContent>
+
+                <TabsContent value="public" className="space-y-4">
+                  {walletData.assets.map((asset) => (
+                    <div
+                      key={asset.id}
+                      className="flex flex-col space-y-3 p-3 border rounded-lg"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <div className="bg-primary text-primary-foreground font-bold text-xs rounded-full h-full w-full flex items-center justify-center">
+                              {asset.name.substring(0, 2)}
+                            </div>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{asset.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Public Balance
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">
+                            {asset.publicAmount.toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => navigateToSwap(asset.id)}
+                        >
+                          Swap
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="flex-1"
+                          onClick={navigateToSend}
+                        >
+                          <Send className="h-3 w-3 mr-1" /> Send
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full" onClick={navigateToSend}>
+                <Send className="h-4 w-4 mr-2" /> Send Tokens
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </div>

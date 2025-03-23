@@ -58,9 +58,9 @@ export const fetchAztecTokenBalance = async (wallet) => {
     // deployedContract.address,
     l2Token,
     TokenContractArtifact,
-    // testwallet
+    testwallet
     // wallet
-    newWallet
+    // newWallet
   );
 
   const balance = await contract.methods
