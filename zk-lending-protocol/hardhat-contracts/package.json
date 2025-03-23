@@ -1,0 +1,13 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.19",
+    "noir-artifacts": "file:./noir-artifacts"
+  },
+  "dependencies": {
+    "@aztec/accounts": "^0.82.0",
+    "@aztec/noir-contracts.js": "^0.82.0",
+    "@openzeppelin/contracts": "^5.2.0"
+  }
+}

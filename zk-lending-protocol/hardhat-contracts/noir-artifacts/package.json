@@ -1,0 +1,19 @@
+{
+  "name": "noir-artifacts",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aztec/aztec.js": "^0.82.0"
+  },
+  "devDependencies": {
+    "@aztec/noir-contracts.js": "^0.82.0"
+  },
+  "exports": {
+    "./TokenBridge": "./dest/TokenBridge.js",
+    "./Lending": "./dest/Lending.js"
+  }
+}
